@@ -2,7 +2,6 @@ import time
 import pyautogui
 import pyperclip
 from PIL import Image
-import threading
 
 
 def run_bot(decision):
@@ -74,11 +73,54 @@ class GUI_CONTROLLER:
             pyautogui.click(button='right')
             time.sleep(1)
 
+    def add_contact_ai(self, decision, number):
+        if "WhatsappApp_location" in decision:
+            pyautogui.click(decision["WhatsappApp_location"])
+            time.sleep(2)
+        elif "AddContact_location" in decision:
+            pyautogui.click(decision["AddContact_location"])
+            time.sleep(2)
+        elif "NewContact_location" in decision:
+            pyautogui.click(decision["NewContact_location"])
+            time.sleep(2)
+        elif "SaveNewContact_location" in decision:
+            # pyautogui to add name contact
+            # pyautogui to add number contact
+            if (self.decision["ExistNumber"] and not self.decision["NoExistNumber"]):
+                pyautogui.click(
+                    decision["SaveNewContact_location"], duration=1)
+                time.sleep(2)
+                self.back_button_mobile(1)
+                return True
+            else:
+                self.back_button_mobile(4)
+                return False
+
     def take_screenshot(self):
 
         pyautogui.FAILSAFE = False
 
         while not self.stop_event.is_set():
+
+            self.decision = {
+                "WhatsappApp": False,
+                "AddContact": False,
+                "Search": False,
+                "NewContact": False,
+                "SaveNewContact": False,
+                "ExistNumber": False,
+                "NoExistNumber": False,
+                "WidgetOpenGallery": False,
+                "GalleryButton": False,
+                "Options": False,
+                "GaleriaButton": False,
+                "FolderOlimpic": False,
+                "InputToSendMessage": False,
+                "Input": False,
+                "InputNumber": False,
+                "Contacts": False,
+                "ImageOlympic": False,
+            }
 
             # Take screenshot
             screenshot = pyautogui.screenshot(
@@ -87,7 +129,7 @@ class GUI_CONTROLLER:
                 'RGB', screenshot.size, screenshot.tobytes())
 
             # return a list of Results objects
-            results = self.model([screenshot], conf=.50)
+            results = self.model([screenshot], conf=.70)
             boxes = results[0].boxes.xyxy.tolist()
             classes = results[0].boxes.cls.tolist()
             names = results[0].names
@@ -158,6 +200,7 @@ class GUI_CONTROLLER:
                     self.decision["SendMessage"] = True
                     self.decision["SendMessage_location"] = (
                         center_x+self.deslocation_left, center_y+self.deslocation_top)
+            self.add_contact_ai(self.decision, "11999999999")
 
     def add_contact(self, number):
         # Open WhatsApp Mobile
@@ -184,11 +227,6 @@ class GUI_CONTROLLER:
 
         pyautogui.write(number)
         time.sleep(3)
-        screenshot_thread = threading.Thread(
-            target=self.take_screenshot)
-        screenshot_thread.start()
-        self.stop_event.set()
-        screenshot_thread.join()
 
         if (self.decision["ExistNumber"] and not self.decision["NoExistNumber"]):
             pyautogui.click(

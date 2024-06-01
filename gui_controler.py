@@ -67,6 +67,8 @@ class GUI_CONTROLLER:
             "InputToSendMessage": False,
             "SendMessage": False,
         }
+        self.ADD_CONTACT = False
+        self.SEND_MESSAGE = False
 
     def back_button_mobile(self, times):
         for i in range(times):
@@ -75,26 +77,98 @@ class GUI_CONTROLLER:
 
     def add_contact_ai(self, decision, number):
         if "WhatsappApp_location" in decision:
-            pyautogui.click(decision["WhatsappApp_location"])
+            pyautogui.moveTo(decision["WhatsappApp_location"])
+            time.sleep(0.5)
+            pyautogui.click()
             time.sleep(2)
         elif "AddContact_location" in decision:
-            pyautogui.click(decision["AddContact_location"])
+            pyautogui.moveTo(decision["AddContact_location"])
+            time.sleep(0.5)
+            pyautogui.click()
             time.sleep(2)
         elif "NewContact_location" in decision:
-            pyautogui.click(decision["NewContact_location"])
+            pyautogui.moveTo(decision["NewContact_location"])
+            time.sleep(0.5)
+            pyautogui.click()
+            time.sleep(2)
+        elif "Input_location" in decision:
+            pyautogui.moveTo(decision["Input_location"])
+            time.sleep(1)
+            pyautogui.click()
+            pyautogui.write(number)
+            time.sleep(2)
+            pyautogui.moveTo(decision["InputNumber_location"])
+            pyautogui.click()
+            pyautogui.write(number)
             time.sleep(2)
         elif "SaveNewContact_location" in decision:
-            # pyautogui to add name contact
-            # pyautogui to add number contact
             if (self.decision["ExistNumber"] and not self.decision["NoExistNumber"]):
                 pyautogui.click(
                     decision["SaveNewContact_location"], duration=1)
                 time.sleep(2)
                 self.back_button_mobile(1)
+                self.ADD_CONTACT = True
                 return True
             else:
                 self.back_button_mobile(4)
                 return False
+
+    def send_message_ai(self, decision, number):
+        if "Search_location" in decision:
+            pyautogui.moveTo(decision["Search_location"])
+            time.sleep(0.5)
+            pyautogui.click()
+            time.sleep(1)
+            pyautogui.write(number)
+            time.sleep(5)
+        elif "Contacts_location" in decision:
+            # precision problem
+            pyautogui.moveTo(decision["Contacts_location"])
+            time.sleep(0.5)
+            pyautogui.click()
+        elif "WidgetOpenGallery_location" in decision:
+            pyautogui.moveTo(decision["WidgetOpenGallery_location"])
+            time.sleep(0.5)
+            pyautogui.click()
+            time.sleep(2)
+        elif "GalleryButton_location" in decision:
+            # precision problem
+            pyautogui.moveTo(decision["GalleryButton_location"])
+            time.sleep(0.5)
+            pyautogui.click()
+        elif "OptionsGallery_location" in decision:
+            pyautogui.moveTo(decision["OptionsGallery_location"])
+            time.sleep(0.5)
+            pyautogui.click()
+        elif "Options_location" in decision:
+            pyautogui.moveTo(decision["Options_location"])
+            time.sleep(0.5)
+            pyautogui.click()
+            time.sleep(2)
+        elif "GaleriaButton_location" in decision:
+            pyautogui.moveTo(decision["GaleriaButton_location"])
+            time.sleep(0.5)
+            pyautogui.click()
+            time.sleep(5)
+        elif "FolderOlimpic_location" in decision:
+            pyautogui.moveTo(decision["FolderOlimpic_location"])
+            time.sleep(0.5)
+            pyautogui.click()
+        elif "ImageOlympic_location" in decision:
+            pyautogui.moveTo(decision["ImageOlympic_location"])
+            time.sleep(0.5)
+            pyautogui.click()
+        elif "InputToSendMessage_location" in decision:
+            pyautogui.moveTo(decision["InputToSendMessage_location"])
+            time.sleep(5)
+            pyautogui.click()
+            self.copy_message()
+            time.sleep(2)
+            # precision problem
+            pyautogui.moveTo(decision["SendMessage_location"])
+            time.sleep(2)
+            pyautogui.click()
+            self.SEND_MESSAGE = True
 
     def take_screenshot(self):
 
@@ -129,7 +203,7 @@ class GUI_CONTROLLER:
                 'RGB', screenshot.size, screenshot.tobytes())
 
             # return a list of Results objects
-            results = self.model([screenshot], conf=.70)
+            results = self.model([screenshot], conf=.10)
             boxes = results[0].boxes.xyxy.tolist()
             classes = results[0].boxes.cls.tolist()
             names = results[0].names
@@ -184,6 +258,10 @@ class GUI_CONTROLLER:
                     self.decision["OptionsGallery"] = True
                     self.decision["OptionsGallery_location"] = (
                         center_x+self.deslocation_left, center_y+self.deslocation_top)
+                elif name == "Options":
+                    self.decision["Options"] = True
+                    self.decision["Options_location"] = (
+                        center_x+self.deslocation_left, center_y+self.deslocation_top)
                 elif name == "GaleriaButton":
                     self.decision["GaleriaButton"] = True
                     self.decision["GaleriaButton_location"] = (
@@ -200,7 +278,34 @@ class GUI_CONTROLLER:
                     self.decision["SendMessage"] = True
                     self.decision["SendMessage_location"] = (
                         center_x+self.deslocation_left, center_y+self.deslocation_top)
-            self.add_contact_ai(self.decision, "11999999999")
+                elif name == "Contacts":
+                    self.decision["Contacts"] = True
+                    self.decision["Contacts_location"] = (
+                        center_x+self.deslocation_left, center_y+self.deslocation_top)
+                elif name == "ImageOlympic":
+                    self.decision["ImageOlympic"] = True
+                    self.decision["ImageOlympic_location"] = (
+                        center_x+self.deslocation_left, center_y+self.deslocation_top)
+                elif name == "Input":
+                    self.decision["Input"] = True
+                    self.decision["Input_location"] = (
+                        center_x+self.deslocation_left, center_y+self.deslocation_top)
+                elif name == "InputNumber":
+                    self.decision["InputNumber"] = True
+                    self.decision["InputNumber_location"] = (
+                        center_x+self.deslocation_left, center_y+self.deslocation_top)
+            if not self.ADD_CONTACT and False:
+                self.add_contact_ai(self.decision, "11999999999")
+            if not self.SEND_MESSAGE:
+                self.send_message_ai(self.decision, "81996387392")
+
+    def copy_message(self):
+        pyautogui.moveTo(900, 570, duration=1)
+        pyautogui.mouseDown(button='left')
+        pyautogui.moveTo(990, 570, 1)
+        pyautogui.mouseUp(button='left')
+        time.sleep(2)
+        pyautogui.click(860, 520, duration=1)
 
     def add_contact(self, number):
         # Open WhatsApp Mobile
